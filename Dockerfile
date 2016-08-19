@@ -1,25 +1,37 @@
 FROM ubuntu
 MAINTAINER Tony Thell <tony969@gmail.com>
 
+# install required packages and enable the mcrypt module
 RUN DEBIAN_FRONTEND=noninteractive; apt-get update && apt-get install -y \
-  nginx git supervisor vim php-fpm php-cli php-curl php-gd php-json \
-  php-pgsql php-mbstring php-mcrypt php-xml && apt-get clean
-
-# enable the mcrypt module
-RUN phpenmod mcrypt
+    git \
+    nginx \
+    php-cli \
+    php-curl \
+    php-fpm \
+    php-gd \
+    php-json \
+    php-mbstring \
+    php-mcrypt \
+    php-pgsql \
+    php-xml \
+    supervisor \
+    vim \
+&& apt-get clean && phpenmod mcrypt
 
 # create php directory so php-fpm can create a socket
 RUN mkdir /var/run/php
 
 # add ttrss as the only nginx site
-ADD ttrss.nginx.conf /etc/nginx/sites-available/ttrss
+COPY ttrss.nginx.conf /etc/nginx/sites-available/ttrss
 RUN ln -s /etc/nginx/sites-available/ttrss /etc/nginx/sites-enabled/ttrss
 RUN rm -rf /etc/nginx/sites-enabled/default /var/www/html
 
 # install ttrss and patch configuration
 RUN git clone https://github.com/dittos/ttrss-mirror.git /var/www
+
 # add 3rd-party themes
-COPY themes/* /var/www/themes/
+COPY themes /var/www/themes/
+
 WORKDIR /var/www
 RUN cp config.php-dist config.php
 RUN sed -i -e "/'SELF_URL_PATH'/s/ '.*'/ 'http:\/\/localhost\/'/" config.php
