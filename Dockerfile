@@ -1,5 +1,5 @@
 FROM ubuntu
-MAINTAINER Tony Thell <tony969@gmail.com>
+MAINTAINER Tony Thell <tonythell@users.noreply.github.com>
 
 # install required packages and enable the mcrypt module
 RUN DEBIAN_FRONTEND=noninteractive; apt-get update && apt-get install -y \
